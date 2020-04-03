@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ying.background.mapper.CsSbZszmMapper" >
+  <resultMap id="BaseResultMap" type="com.ying.background.dao.model.CsSbZszm" >
+    <id column="PZXH" property="pzxh" jdbcType="BIGINT" />
+    <result column="UUID" property="uuid" jdbcType="CHAR" />
+    <result column="ZSXM_DM" property="zsxmDm" jdbcType="CHAR" />
+    <result column="ZSPM_DM" property="zspmDm" jdbcType="CHAR" />
+    <result column="ZSZM_DM" property="zszmDm" jdbcType="CHAR" />
+    <result column="SSJMXZ_DM" property="ssjmxzDm" jdbcType="VARCHAR" />
+    <result column="FDSL" property="fdsl" jdbcType="DECIMAL" />
+    <result column="SL_1" property="sl1" jdbcType="DECIMAL" />
+    <result column="DGBZ" property="dgbz" jdbcType="CHAR" />
+    <result column="JSBZ_1" property="jsbz1" jdbcType="CHAR" />
+    <result column="JYXMJSLX" property="jyxmjslx" jdbcType="CHAR" />
+    <result column="SX" property="sx" jdbcType="DECIMAL" />
+    <result column="XX" property="xx" jdbcType="DECIMAL" />
+    <result column="SJLY_SWJGDM" property="sjlySwjgdm" jdbcType="CHAR" />
+    <result column="SWJG_DM" property="swjgDm" jdbcType="CHAR" />
+    <result column="XZQHSZ_DM" property="xzqhszDm" jdbcType="CHAR" />
+    <result column="YXQQ" property="yxqq" jdbcType="DATE" />
+    <result column="YXQZ" property="yxqz" jdbcType="DATE" />
+    <result column="XYBZ" property="xybz" jdbcType="CHAR" />
+    <result column="YXBZ" property="yxbz" jdbcType="CHAR" />
+    <result column="LRRQ" property="lrrq" jdbcType="TIMESTAMP" />
+    <result column="XGRQ" property="xgrq" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    PZXH, UUID, ZSXM_DM, ZSPM_DM, ZSZM_DM, SSJMXZ_DM, FDSL, SL_1, DGBZ, JSBZ_1, JYXMJSLX,
+    SX, XX, SJLY_SWJGDM, SWJG_DM, XZQHSZ_DM, YXQQ, YXQZ, XYBZ, YXBZ, LRRQ, XGRQ
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from cs_sb_zszm_test1
+    where PZXH = #{pzxh,jdbcType=BIGINT}
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from cs_sb_zszm_test1
+  </select>
+</mapper>

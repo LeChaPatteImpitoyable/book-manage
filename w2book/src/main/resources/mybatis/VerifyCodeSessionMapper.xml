@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ying.background.mapper.VerifyCodeSessionMapper">
+
+	<resultMap id="verifyCodeSessionMap" type="com.ying.background.model.VerifyCodeSession">
+		<result column="ID"    	  property="id" />
+		<result column="TOKEN"    property="token" />
+		<result column="IP"       property="ip" />
+		<result column="MOBILE"   property="mobile" />
+		<result column="PASSWORD" property="password" />
+		<result column="UID"      property="uid" />
+		<result column="TIME"     property="time" />
+	</resultMap>
+
+	<select id="getVerifyCodeSession" resultMap="verifyCodeSessionMap">
+		select * from verifycodesession where mobile=#{mobile} and uid=#{uid}
+	</select>
+
+	<insert id="insertVerifyCodeSession" parameterType="com.ying.background.model.VerifyCodeSession">
+		insert into verifycodesession(token,time,ip,mobile,password,uid)
+		     values(#{token},#{time},#{ip},#{mobile},#{password},#{uid})
+	</insert>
+
+
+	<update id="updateVerifyCodeSession" parameterType="java.util.Map">
+		update verifycodesession set token=#{token}, time=#{time} where mobile=#{mobile} and uid=#{uid}
+	</update>
+
+	<delete id="deleteVerifyCodeSession">
+		delete from verifycodesession where TOKEN = #{token}
+	</delete>
+</mapper>

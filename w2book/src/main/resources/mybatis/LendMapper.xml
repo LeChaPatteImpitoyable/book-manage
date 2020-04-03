@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ying.background.mapper.LendMapper" >
+  <resultMap id="BaseResultMap" type="com.ying.background.model.Lend" >
+    <id column="sernum" property="sernum" jdbcType="BIGINT" />
+    <result column="book_id" property="bookId" jdbcType="BIGINT" />
+    <result column="reader_id" property="readerId" jdbcType="INTEGER" />
+    <result column="lend_date" property="lendDate" jdbcType="DATE" />
+    <result column="back_date" property="backDate" jdbcType="DATE" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="modify_id" property="modifyId" jdbcType="INTEGER" />
+    <result column="is_deleted" property="isDeleted" jdbcType="INTEGER" />
+    <result column="book_name" property="bookName" jdbcType="VARCHAR" />
+    <result column="reader_name" property="readerName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    sernum, book_id, reader_id, lend_date, back_date, create_time, create_id, modify_time, 
+    modify_id, is_deleted
+  </sql>
+
+  <select id="selectLendByReadeId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from lend_list
+    where reader_id = #{readerId}
+    <if test="length != 0">
+      limit #{offset}, #{length}
+    </if>
+  </select>
+
+  <insert id="insert" parameterType="com.ying.background.model.Lend" >
+    insert into lend_list ( book_id, reader_id,
+      lend_date, create_time, create_id, modify_time)
+    values ( #{bookId,jdbcType=BIGINT}, #{readerId,jdbcType=INTEGER},
+      now(), now(), #{createId,jdbcType=INTEGER}, now())
+  </insert>
+
+  <update id="bookReturn" parameterType="com.ying.background.model.Lend" >
+    update lend_list SET
+    back_date = now(),modify_time = now(),modify_id = #{modifyId}
+    where book_id = #{bookId} and back_date is null
+  </update>
+
+  <select id="queryLendListCount" resultType="java.math.BigDecimal">
+    select COUNT(1) from lend_list ll
+    <if test="keyword != null and keyword != ''">
+      left join reader_info ri
+      on ll.reader_id=ri.reader_id
+      left join book_info bi
+      on ll.book_id=bi.book_id
+    </if>
+    <where>
+      <if test="keyword != null and keyword != ''">
+        (position(#{keyword} in ll.book_id) or position(#{keyword} in ll.reader_id)
+        or position(#{keyword} in ri.name) or position(#{keyword} in bi.name))
+      </if>
+      <if test="deadline != 0">
+        and ll.back_date is null and (to_days(now()) - to_days(ll.lend_date) >= #{deadline})
+      </if>
+    </where>
+  </select>
+
+  <select id="queryLendList" resultMap="BaseResultMap">
+    select ll.*,bi.name as book_name,ri.name as reader_name from lend_list ll
+      left join reader_info ri
+      on ll.reader_id=ri.reader_id
+      left join book_info bi
+      on ll.book_id=bi.book_id
+    <where>
+      <if test="keyword != null and keyword != ''">
+        (position(#{keyword} in ll.book_id) or position(#{keyword} in ll.reader_id)
+        or position(#{keyword} in ri.name) or position(#{keyword} in bi.name))
+      </if>
+      <if test="deadline != 0">
+        and ll.back_date is null and (to_days(now()) - to_days(ll.lend_date) >= #{deadline})
+      </if>
+    </where>
+    <if test="length != 0">
+      order by ll.back_date,ll.sernum
+      limit #{offset}, #{length}
+    </if>
+  </select>
+</mapper>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ying.background.mapper.BookInfoMapper" >
+  <cache type="com.ying.background.services.RedisCache">
+    <property name="eviction" value="LRU" />
+    <property name="flushInterval" value="6000000" />
+    <property name="size" value="1024" />
+    <property name="readOnly" value="false" />
+  </cache>
+  <resultMap id="BaseResultMap" type="com.ying.background.model.BookInfo" >
+    <id column="book_id" property="bookId" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="author" property="author" jdbcType="VARCHAR" />
+    <result column="publish" property="publish" jdbcType="VARCHAR" />
+    <result column="ISBN" property="isbn" jdbcType="VARCHAR" />
+    <result column="language" property="language" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="pubdate" property="pubdate" jdbcType="DATE" />
+    <result column="class_id" property="classId" jdbcType="VARCHAR" />
+    <result column="pressmark" property="pressmark" jdbcType="INTEGER" />
+    <result column="state" property="state" jdbcType="SMALLINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="modify_id" property="modifyId" jdbcType="INTEGER" />
+    <result column="is_deleted" property="isDeleted" jdbcType="INTEGER" />
+    <result column="introduction" property="introduction" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    book_id, name, author, publish, ISBN, language, price, pubdate, class_id, pressmark,
+    state, create_time, create_id, modify_time, modify_id, is_deleted, introduction
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from book_info
+    where book_id = #{bookId,jdbcType=BIGINT}
+  </select>
+
+  <select id="selectAllBooks" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from book_info
+    where is_deleted = 0;
+  </select>
+
+  <insert id="insert" parameterType="com.ying.background.model.BookInfo" >
+    insert into book_info (name, author,
+      publish, ISBN, language,
+      price, pubdate, class_id,
+      pressmark, state, create_time,
+      create_id, modify_time, modify_id, introduction)
+    values (#{name,jdbcType=VARCHAR}, #{author,jdbcType=VARCHAR},
+      #{publish,jdbcType=VARCHAR}, #{isbn,jdbcType=VARCHAR}, #{language,jdbcType=VARCHAR},
+      #{price,jdbcType=DECIMAL}, #{pubdate,jdbcType=DATE}, #{classId,jdbcType=VARCHAR},
+      #{pressmark,jdbcType=INTEGER}, #{state,jdbcType=SMALLINT}, now(),
+      #{createId,jdbcType=INTEGER}, now(), #{modifyId,jdbcType=INTEGER}, #{introduction,jdbcType=LONGVARCHAR})
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.ying.background.model.BookInfo" >
+    update book_info
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="author != null" >
+        author = #{author,jdbcType=VARCHAR},
+      </if>
+      <if test="publish != null" >
+        publish = #{publish,jdbcType=VARCHAR},
+      </if>
+      <if test="isbn != null" >
+        ISBN = #{isbn,jdbcType=VARCHAR},
+      </if>
+      <if test="language != null" >
+        language = #{language,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="pubdate != null" >
+        pubdate = #{pubdate,jdbcType=DATE},
+      </if>
+      <if test="classId != null" >
+        class_id = #{classId,jdbcType=VARCHAR},
+      </if>
+      <if test="pressmark != null" >
+        pressmark = #{pressmark,jdbcType=INTEGER},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=SMALLINT},
+      </if>
+      <if test="1==1" >
+        modify_time = now(),
+      </if>
+      <if test="modifyId != null" >
+        modify_id = #{modifyId,jdbcType=INTEGER},
+      </if>
+      <if test="isDeleted != null" >
+        is_deleted = #{isDeleted,jdbcType=INTEGER},
+      </if>
+      <if test="introduction != null" >
+        introduction = #{introduction,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where book_id = #{bookId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.ying.background.model.BookInfo" >
+    update book_info
+    set name = #{name,jdbcType=VARCHAR},
+      author = #{author,jdbcType=VARCHAR},
+      publish = #{publish,jdbcType=VARCHAR},
+      ISBN = #{isbn,jdbcType=VARCHAR},
+      language = #{language,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DECIMAL},
+      pubdate = #{pubdate,jdbcType=DATE},
+      class_id = #{classId,jdbcType=VARCHAR},
+      pressmark = #{pressmark,jdbcType=INTEGER},
+      state = #{state,jdbcType=SMALLINT},
+      modify_time = now(),
+      modify_id = #{modifyId,jdbcType=INTEGER}
+    where book_id = #{bookId,jdbcType=BIGINT}
+  </update>
+
+  <update id="deleteBookByBookId">
+    update book_info
+    set is_deleted = #{isDeleted},
+      modify_time = now(),
+      modify_id = #{modifyId}
+    where book_id = #{bookId}
+  </update>
+
+  <select id="queryBooksCount" resultType="java.math.BigDecimal">
+    SELECT count(*) FROM book_info
+    WHERE is_deleted = 0
+    <if test="searchWord != null and searchWord != ''">
+      and (position(#{searchWord} in book_id) or position(#{searchWord} in name))
+    </if>
+  </select>
+
+  <select id="queryBooks" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List" /> FROM book_info
+    WHERE is_deleted = 0
+    <if test="searchWord != null and searchWord != ''">
+      and (position(#{searchWord} in book_id) or position(#{searchWord} in name))
+    </if>
+    <if test="length != 0">
+      limit #{offset}, #{length}
+    </if>
+  </select>
+</mapper>
